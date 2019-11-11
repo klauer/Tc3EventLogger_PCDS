@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <POU Name="MAIN" Id="{9f520a4d-ae50-41fb-ba73-0842ad84d02a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	nSendMessage : UINT;
+	bRaiseAlarm : BOOL;
+	bConfirmAlarm : BOOL;
+	bClearAlarm: BOOL;
+
+	fbLogger : FB_TcEventLogger;
+	fbMessage : FB_TcMessage;
+	fbAlarm : FB_TcAlarm;
+	bIsInitalized : BOOL;
+	
+	bSetJsonAttribute : BOOL;
+	sJsonAttribute : STRING := '{"key":"value"}';
+	
+	msg : FB_LogMessage;
+	hr : HRESULT;
+	hrLastError : HRESULT;
+	iCycle: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[iCycle := iCycle + 1;
+
+IF (iCycle MOD 1000) = 0 THEN
+	msg(sMsg:='cycle 1k', eSevr:=TcEventSeverity.Error);
+END_IF
+ 
+IF NOT bIsInitalized THEN
+	bIsInitalized := TRUE;
+	hr := fbAlarm.CreateEx(TC_EVENTS.PublisherEventClass.Alarm, TRUE, 0);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+	//hr := fbMessage.CreateEx(TC_EVENTS.PublisherEventClass.Message, 0);
+	hr := fbMessage.CreateEx(TC_EVENTS.TcGeneralAdsEventClass.Aborted, 0);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+END_IF
+
+IF bSetJsonAttribute THEN
+	bSetJsonAttribute := FALSE;
+	hr := fbAlarm.SetJsonAttribute(sJsonAttribute);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+	hr := fbMessage.SetJsonAttribute(sJsonAttribute);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+END_IF
+
+WHILE nSendMessage > 0 DO
+	hr := fbMessage.Send(0);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+	nSendMessage := nSendMessage - 1;
+END_WHILE
+
+IF bRaiseAlarm THEN
+	bRaiseAlarm := FALSE;
+	hr := fbAlarm.Raise(0);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+END_IF
+
+IF bConfirmAlarm THEN
+	bConfirmAlarm := FALSE;
+	hr := fbAlarm.Confirm(0);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+END_IF
+
+IF bClearAlarm THEN
+	bClearAlarm := FALSE;
+	hr := fbAlarm.Clear(0, FALSE);
+	IF FAILED(hr) THEN
+		hrLastError := hr;
+	END_IF
+END_IF
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

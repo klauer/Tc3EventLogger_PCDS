@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <POU Name="FB_LogHandler" Id="{3f56ea05-5d12-4cf3-aa32-b1078ff3baf8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_LogHandler
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+
+VAR
+	
+	bInitialized	:	BOOL;
+	
+	{attribute 'pytmc' := '
+		pv: ADS
+	'}
+	fbTcAdsListener : FB_Listener;	
+	
+	{attribute 'pytmc' := '
+		pv: Router
+	'}
+	fbTcRouterListener : FB_Listener;	
+	
+	{attribute 'pytmc' := '
+		pv: RTime
+	'}
+	fbTcRTimeListener : FB_Listener;	
+	
+	{attribute 'pytmc' := '
+		pv: System
+	'}
+	fbTcSystemListener : FB_Listener;
+	
+	{attribute 'pytmc' := '
+		pv: Windows
+	'}
+	fbWindowsListener : FB_Listener;	
+
+	{attribute 'pytmc' := '
+		pv: LCLS
+	'}
+	fbLCLSListener 	: FB_Listener;	
+
+	eMinSeverity	:	TcEventSeverity := TcEventSeverity.Verbose;	
+END_VAR
+
+VAR CONSTANT
+	nNumEvents : DINT := 6;
+	defaultEventClasses : ARRAY [1..nNumEvents] OF GUID := [
+];
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bInitialized THEN 
+	bInitialized := TRUE;
+	fbTcAdsListener.Configure(i_EventClass:=TC_EVENT_CLASSES.TcGeneralAdsEventClass, i_Severity:=eMinSeverity);
+	fbTcRouterListener.Configure(i_EventClass:=TC_EVENT_CLASSES.TcRouterEventClass, i_Severity:=eMinSeverity);
+	fbTcRTimeListener.Configure(i_EventClass:=TC_EVENT_CLASSES.TcRTimeEventClass, i_Severity:=eMinSeverity);
+	fbTcSystemListener.Configure(i_EventClass:=TC_EVENT_CLASSES.TcSystemEventClass, i_Severity:=eMinSeverity);
+	fbWindowsListener.Configure(i_EventClass:=TC_EVENT_CLASSES.Win32EventClass, i_Severity:=eMinSeverity);
+	fbLCLSListener.Configure(i_EventClass:=TC_EVENT_CLASSES.LCLSLoggingEvent, i_Severity:=eMinSeverity);
+END_IF 
+
+fbTcAdsListener.Execute();
+fbTcRouterListener.Execute();
+fbTcRTimeListener.Execute();
+fbTcSystemListener.Execute();
+fbWindowsListener.Execute();
+fbLCLSListener.Execute();]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <POU Name="FB_LogMessage" Id="{0893f9f8-65e8-4db6-822f-019a7a161c6c}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK FB_LogMessage
+VAR_INPUT
+	sMsg			: T_MaxString; 		// Message to send
+	eSevr			: TcEventSeverity	:= TcEventSeverity.Verbose;
+	eSubsystem		: E_Subsystem; 		// Subsystem TODO
+	Json			: T_MaxString;		// JSON to add to the message
+END_VAR
+
+VAR_OUTPUT
+END_VAR
+
+VAR
+	bInitialized		:	BOOL := FALSE;
+	bInitFailed			:	BOOL := FALSE;
+	sMessage 			:	T_MaxString;
+	sSubsystemSource	:	STRING;
+	fbMessage			:	REFERENCE TO FB_TcMessage;
+	fbMessages 			:	ARRAY [1..5] OF FB_TcMessage;
+	fbSource 			:	FB_TcSourceInfo;
+	ipResultMessage	 	:	I_TcMessage;
+	hr 					:	HRESULT;
+	hrLastInternalError :	HRESULT;
+	eTraceLevel 		:	TcEventSeverity := TcEventSeverity.Verbose;
+	eEventEntry 		:	TcEventEntry;
+	
+	{attribute 'instance-path'} 
+    {attribute 'noinit'} 
+	sPath				:	T_MaxString;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bInitialized AND NOT bInitFailed THEN
+	hr := fbMessages[TC_EVENTS.LCLSLoggingEvent.Verbose.nEventId].CreateEx(TC_EVENTS.LCLSLoggingEvent.Verbose, 0 (*fbSource*) );
+	IF FAILED(hr) THEN
+		bInitFailed := TRUE;
+		hrLastInternalError := hr;
+	END_IF
+
+	hr := fbMessages[TC_EVENTS.LCLSLoggingEvent.Warning.nEventId].CreateEx(TC_EVENTS.LCLSLoggingEvent.Warning, 0 (*fbSource*) );
+	IF FAILED(hr) THEN
+		bInitFailed := TRUE;
+		hrLastInternalError := hr;
+	END_IF
+
+	hr := fbMessages[TC_EVENTS.LCLSLoggingEvent.Info.nEventId].CreateEx(TC_EVENTS.LCLSLoggingEvent.Info, 0 (*fbSource*) );
+	IF FAILED(hr) THEN
+		bInitFailed := TRUE;
+		hrLastInternalError := hr;
+	END_IF
+
+	hr := fbMessages[TC_EVENTS.LCLSLoggingEvent.Error.nEventId].CreateEx(TC_EVENTS.LCLSLoggingEvent.Error, 0 (*fbSource*) );
+	IF FAILED(hr) THEN
+		bInitFailed := TRUE;
+		hrLastInternalError := hr;
+	END_IF
+
+	hr := fbMessages[TC_EVENTS.LCLSLoggingEvent.Critical.nEventId].CreateEx(TC_EVENTS.LCLSLoggingEvent.Critical, 0 (*fbSource*) );
+	IF FAILED(hr) THEN
+		bInitFailed := TRUE;
+		hrLastInternalError := hr;
+	END_IF
+	
+	IF bInitFailed THEN
+		ADSLOGSTR(
+			msgCtrlMask := ADSLOG_MSGTYPE_ERROR, 
+			msgFmtStr   := '[LOGGER] Initialization failed in %s', 
+			strArg      := sPath,
+		); 
+	ELSE
+		bInitialized := TRUE;
+	END_IF
+END_IF
+
+IF bInitFailed THEN
+	RETURN;
+END_IF
+	
+// Map the message severity to the LCLSLoggingEvent:
+CASE eSevr OF
+	TcEventSeverity.Verbose: 	fbMessage REF= fbMessages[TC_EVENTS.LCLSLoggingEvent.Verbose.nEventId];
+	TcEventSeverity.Warning:	fbMessage REF= fbMessages[TC_EVENTS.LCLSLoggingEvent.Warning.nEventId];
+	TcEventSeverity.Info:		fbMessage REF= fbMessages[TC_EVENTS.LCLSLoggingEvent.Info.nEventId];		
+	TcEventSeverity.Error:		fbMessage REF= fbMessages[TC_EVENTS.LCLSLoggingEvent.Error.nEventId]; 
+	TcEventSeverity.Critical:	fbMessage REF= fbMessages[TC_EVENTS.LCLSLoggingEvent.Critical.nEventId];
+	ELSE
+		RETURN;
+END_CASE
+
+CASE eSubsystem OF
+	E_Subsystem.FIELDBUS: 	sSubsystemSource := '/Fieldbus';
+	E_Subsystem.MOTION: 	sSubsystemSource := '/Motion';
+	E_Subsystem.MPS: 		sSubsystemSource := '/MPS';
+	E_Subsystem.SDS: 		sSubsystemSource := '/SDS';
+	E_Subsystem.VACUUM:		sSubsystemSource := '/Vacuum';	
+	ELSE
+		sSubsystemSource := '/Unknown';
+END_CASE
+
+// Clearing the source here will clear the event GUID, causing the message to not be resolved.
+// However, we can change the name as desired:
+//fbSource.Clear();
+fbSource.sName := CONCAT(sPath, sSubsystemSource);
+
+ipResultMessage := fbMessage;
+hr := fbMessage.CreateEx(stEventEntry:=ipResultMessage.stEventEntry, ipSourceInfo:=fbSource);
+
+// This is where the message text gets appended:
+fbMessage.ipArguments.Clear();
+fbMessage.ipArguments.AddString(sMsg);
+
+// For a final format of:
+// 'Path.to.FB_LogMessage/Subsystem': {Unknown,Error,Warning,Verbose} (message)
+
+IF NOT FAILED(hr) AND fbMessage.eSeverity >= eTraceLevel THEN
+	hr := fbMessage.Send(0);
+END_IF
+
+IF FAILED(hr) THEN
+	hrLastInternalError := hr;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <POU Name="MAIN" Id="{e5156229-dc7e-47cb-bfdc-7d4aa00249b1}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	{attribute 'pytmc' := '
+		pv: Logging
+	'}
+	fbLogHandler : FB_LogHandler;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbLogHandler();
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

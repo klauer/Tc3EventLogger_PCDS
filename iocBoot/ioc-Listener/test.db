@@ -1,0 +1,135 @@
+record(mbbi, "Priority1_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(ZRVL, "0")
+  field(ZRST, "Verbose")
+  field(ONVL, "1")
+  field(ONST, "Info")
+  field(TWVL, "2")
+  field(TWST, "Warning")
+  field(THVL, "3")
+  field(THST, "Error")
+  field(FRVL, "4")
+  field(FRST, "Critical")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.priority1?")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+}
+
+record(mbbo, "Priority1"){
+  field(ZRVL, "0")
+  field(ZRST, "Verbose")
+  field(ONVL, "1")
+  field(ONST, "Info")
+  field(TWVL, "2")
+  field(TWST, "Warning")
+  field(THVL, "3")
+  field(THST, "Error")
+  field(FRVL, "4")
+  field(FRST, "Critical")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.priority1=")
+}
+
+record(mbbi, "Priority2_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(ZRVL, "0")
+  field(ZRST, "TCEVENTSEVERITY_Verbose")
+  field(ONVL, "1")
+  field(ONST, "TCEVENTSEVERITY_Info")
+  field(TWVL, "2")
+  field(TWST, "TCEVENTSEVERITY_Warning")
+  field(THVL, "3")
+  field(THST, "TCEVENTSEVERITY_Error")
+  field(FRVL, "4")
+  field(FRST, "TCEVENTSEVERITY_Critical")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.priority2?")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+}
+
+record(mbbo, "Priority2"){
+  field(ZRVL, "0")
+  field(ZRST, "TCEVENTSEVERITY_Verbose")
+  field(ONVL, "1")
+  field(ONST, "TCEVENTSEVERITY_Info")
+  field(TWVL, "2")
+  field(TWST, "TCEVENTSEVERITY_Warning")
+  field(THVL, "3")
+  field(THST, "TCEVENTSEVERITY_Error")
+  field(FRVL, "4")
+  field(FRST, "TCEVENTSEVERITY_Critical")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.priority2=")
+}
+
+record(waveform, "Listener:LogEvent:Schema_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(FTVL, "CHAR")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.schema?")
+  field(DTYP, "asynInt8ArrayIn")
+  field(SCAN, "I/O Intr")
+  field(DESC, "Schema string")
+  field(NELM, "80")
+}
+
+record(ai, "Listener:LogEvent:Timestamp_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(PREC, "3")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.ts?")
+  field(DTYP, "asynFloat64")
+  field(SCAN, "I/O Intr")
+  field(DESC, "Unix timestamp")
+}
+
+record(mbbi, "Listener:LogEvent:Severity_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(ZRVL, "0")
+  field(ZRST, "Verbose")
+  field(ONVL, "1")
+  field(ONST, "Info")
+  field(TWVL, "2")
+  field(TWST, "Warning")
+  field(THVL, "3")
+  field(THST, "Error")
+  field(FRVL, "4")
+  field(FRST, "TCEVENTSEVERITY_Critical")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.severity?")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(DESC, "TcEventSeverity")
+}
+
+record(longin, "Listener:LogEvent:MessageID_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.id?")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(DESC, "TwinCAT Message ID")
+}
+
+record(waveform, "Listener:LogEvent:Message_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(FTVL, "CHAR")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.msg?")
+  field(DTYP, "asynInt8ArrayIn")
+  field(SCAN, "I/O Intr")
+  field(NELM, "255")
+}
+
+record(waveform, "Listener:LogEvent:MessageJSON_RBV"){
+  field(PINI, "1")
+  field(TSE, "-2")
+  field(FTVL, "CHAR")
+  field(INP, "@asyn($(PORT),0,1)ADSPORT=852/MAIN.fbListenerTest.fbMessageListener.stEventInfo.json?")
+  field(DTYP, "asynInt8ArrayIn")
+  field(SCAN, "I/O Intr")
+  field(DESC, "Metadata with the message")
+  field(NELM, "10000")
+}

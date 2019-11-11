@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4022.30">
+	<DataTypes>
+		<DataType>
+			<Name GUID="{03745476-8A61-4EFE-A5FE-9F9E1C3CEFF2}" PersistentType="true">PublisherEventClass</Name>
+			<DisplayName TxtId="">
+				<![CDATA[PublisherEventClass]]>
+			</DisplayName>
+			<EventId>
+				<Name Id="1">Message</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Message]]>
+				</DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="2">Alarm</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Alarm]]>
+				</DisplayName>
+				<Severity>Critical</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="3">MessageWithString</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Display text %s]]>
+				</DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{3E9B2A7D-E1CC-4D59-92B2-07AF07074230}"/>
+				<Hide GUID="{B7A625D3-44A2-4DEB-8226-8837080C12C7}"/>
+			</Hides>
+		</DataType>
+		<DataType>
+			<Name GUID="{F180663E-F9A3-4CC0-8736-904A792DF084}" PersistentType="true">LCLSLoggingEvent</Name>
+			<DisplayName TxtId="">
+				<![CDATA[Logging event]]>
+			</DisplayName>
+			<EventId>
+				<Name Id="1">Verbose</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Verbose]]>
+				</DisplayName>
+				<Severity>Verbose</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="2">Info</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Info]]>
+				</DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="3">Warning</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Warning]]>
+				</DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="4">Error</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Error]]>
+				</DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="5">Critical</Name>
+				<DisplayName TxtId="">
+					<![CDATA[Critical]]>
+				</DisplayName>
+				<Severity>Critical</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{E1795292-E225-4C4E-BB3E-CF91E2CA8FE0}"/>
+			</Hides>
+		</DataType>
+	</DataTypes>
+	<Project ProjectGUID="{02F8C7F2-2C48-4B99-BAD5-F8F0DB298A4C}" TargetNetId="172.21.148.145.1.1" ShowHideConfigurations="#x106">
+		<System>
+			<Tasks>
+				<Task Id="2" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
+					<Name>PublisherTask</Name>
+				</Task>
+				<Task Id="3" Priority="1" CycleTime="100000" AmsPort="351" AdtTasks="true">
+					<Name>ListenerTask</Name>
+				</Task>
+			</Tasks>
+		</System>
+		<Plc>
+			<Project GUID="{94AEA898-7881-4CAE-92F3-42E01F218C51}" Name="Publisher" PrjFilePath="Publisher\Publisher.plcproj" TmcFilePath="Publisher\Publisher.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x0002">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Publisher\Publisher.tmc">
+					<Name>Publisher Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x08502001"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+			<Project GUID="{FCB290FC-2BFF-4881-8C93-E77F6F4DE478}" Name="Listener" PrjFilePath="Listener\Listener.plcproj" TmcFilePath="Listener\Listener.tmc" ReloadTmc="true" AmsPort="852" FileArchiveSettings="#x0002" SymbolicMapping="true">
+				<Instance Id="#x08502040" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Listener\Listener.tmc">
+					<Name>Listener Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="1" OTCID="#x08502041"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+		</Plc>
+	</Project>
+</TcSmProject>
