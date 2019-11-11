@@ -24,6 +24,13 @@ STRUCT
 		field: DESC Unix timestamp
 	'}
   	ts			:	LREAL;
+	
+  	{attribute 'pytmc' := '
+		pv: Hostname 
+		io: i
+		field: DESC PLC Hostname
+	'}
+  	plc			:	STRING;
   
 	{attribute 'pytmc' := '
 		pv: Severity
@@ -60,7 +67,7 @@ STRUCT
 		pv: Source
 		io: i
 	'}
-	source		:	 T_MaxString;
+	source		:	 STRING(Tc3_EventLogger.ParameterList.cSourceNameSize - 1);
 	
 	{attribute 'pytmc' := '
 		pv: EventType

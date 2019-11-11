@@ -2,6 +2,15 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
   <GVL Name="GVL_Logger" Id="{5f3f2210-839d-4e90-a9e3-418d9f304b7c}">
     <Declaration><![CDATA[VAR_GLOBAL
+	cLogHost		:	T_IPv4Addr	:= '172.21.148.141';
+	iLogPort		:	UINT		:= 50000;
+	sPlcHostname	:	STRING		:= 'unknown';
+	
+	(* Ref: https://infosys.beckhoff.com/english.php?content=../content/1033/tcpipserver/html/TcPlcLibTcpIp_FB_SocketUdpSendTo.htm
+		TODO: Activate the "Replace constants" option in the
+		TwinCAT PLC Control->"Project->Options...->Build" dialog window. 
+	*)
+	TCPADS_MAXUDP_BUFFSIZE : UDINT :=10000;
 	
 END_VAR]]></Declaration>
   </GVL>
