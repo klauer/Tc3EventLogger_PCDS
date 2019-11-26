@@ -56,6 +56,11 @@ VAR
 	fbSocket	   		:	FB_ConnectionlessSocket;
 	
 	nI: UINT;
+	
+	exc         	    :	__SYSTEM.ExceptionCode;
+    lastExc  	        :	__SYSTEM.ExceptionCode;
+ 	nExceptionIdx		:	INT := -1;
+ 	nExceptionCount		:	INT := 0;
 END_VAR
 
 VAR CONSTANT
@@ -78,6 +83,8 @@ END_VAR]]></Declaration>
 	fbListeners[4] := ADR(fbWindowsListener);
 	fbListeners[5] := ADR(fbLCLSListener);
 END_IF 
+
+__TRY
 	
 IF NOT bHostnameSet THEN
 	fbGetHostName();
@@ -99,12 +106,21 @@ fbSocket(
 	bEnable:=TRUE,
 	nMode:=CONNECT_MODE_ENABLEDBG,
 );
+__CATCH(exc)
+	nExceptionIdx	:= -2;
+	nExceptionCount := nExceptionCount + 1;
+__ENDTRY
 
 (* Poke all of the listeners *)
 FOR nI := 0 TO nNumListeners - 1 DO
-	fbListener REF= fbListeners[nI]^;
-	fbListener.Execute();
-	fbListener.PublishEvents();
+	__TRY
+		fbListener REF= fbListeners[nI]^;
+		fbListener.Execute();
+		fbListener.PublishEvents();
+	__CATCH(exc)
+		nExceptionIdx := UINT_TO_INT(nI);
+		nExceptionCount := nExceptionCount + 1;
+	__ENDTRY
 END_FOR
 ]]></ST>
     </Implementation>

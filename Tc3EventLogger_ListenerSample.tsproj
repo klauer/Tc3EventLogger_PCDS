@@ -77,7 +77,7 @@
 			</Hides>
 		</DataType>
 	</DataTypes>
-	<Project ProjectGUID="{02F8C7F2-2C48-4B99-BAD5-F8F0DB298A4C}" TargetNetId="172.21.148.145.1.1" ShowHideConfigurations="#x106">
+	<Project ProjectGUID="{02F8C7F2-2C48-4B99-BAD5-F8F0DB298A4C}" TargetNetId="172.21.148.227.1.1" ShowHideConfigurations="#x106">
 		<System>
 			<Settings>
 				<Debugger Priority="61"/>

@@ -20,6 +20,13 @@ VAR
 	hr : HRESULT;
 	hrLastError : HRESULT;
 	iCycle: INT;
+	
+    fbWatchdog     : FB_PcWatchdog_BAPI;
+    nWatchdogTimeS : UDINT := 10;  (* 10s *)
+    bEnabled       : BOOL; (* TRUE: watchdog is activated *)
+    bError         : BOOL;
+    nErrID         : UDINT;
+    fbTimer        : TON := (IN := TRUE, PT := T#0S);
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -87,7 +94,30 @@ IF bClearAlarm THEN
 		hrLastError := hr;
 	END_IF
 END_IF
-]]></ST>
+
+fbTimer();
+
+(* 1st enable, then refresh watchdog every 1s *)
+IF fbTimer.Q THEN
+    fbWatchdog(
+        sNetID         := '', 
+        nWatchdogTimeS := nWatchdogTimeS, 
+        bExecute       := TRUE, 
+        tTimeout       := T#5S, 
+    );
+    
+    IF NOT fbWatchdog.bBusy THEN
+        bEnabled   := fbWatchdog.bEnabled;
+        bError     := fbWatchdog.bError;
+        nErrID     := fbWatchdog.nErrID;
+        
+        fbWatchdog(bExecute := FALSE);
+    
+        (* restart timer*)
+        fbTimer(IN := FALSE);
+        fbTimer(IN := TRUE, PT := T#1S); (* refresh watchdog every s *)
+    END_IF
+END_IF]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
