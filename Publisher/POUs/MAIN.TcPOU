@@ -21,103 +21,116 @@ VAR
 	hrLastError : HRESULT;
 	iCycle: INT;
 	
-    fbWatchdog     : FB_PcWatchdog_BAPI;
+	exc         	    :	__SYSTEM.ExceptionCode;
+    lastExc  	        :	__SYSTEM.ExceptionCode;
+ 	nExceptionIdx		:	INT := -1;
+ 	nExceptionCount		:	INT := 0;
+    (*
+	fbWatchdog     : FB_PcWatchdog_BAPI;
     nWatchdogTimeS : UDINT := 10;  (* 10s *)
     bEnabled       : BOOL; (* TRUE: watchdog is activated *)
     bError         : BOOL;
     nErrID         : UDINT;
     fbTimer        : TON := (IN := TRUE, PT := T#0S);
+	*)
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[iCycle := iCycle + 1;
-
-IF (iCycle MOD 50) = 0 THEN
-	msg(sMsg:='cycle mod 50', eSevr:=TcEventSeverity.Warning);
-ELSIF (iCycle MOD 25) = 0 THEN
-	msg(sMsg:='cycle mod 25', eSevr:=TcEventSeverity.Error);
-END_IF
- 
-IF NOT bIsInitalized THEN
-	bIsInitalized := TRUE;
-	hr := fbAlarm.CreateEx(TC_EVENTS.PublisherEventClass.Alarm, TRUE, 0);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+      <ST><![CDATA[__TRY
+	iCycle := iCycle + 1;
+	
+	IF (iCycle MOD 50) = 0 THEN
+		msg(sMsg:='cycle mod 50', eSevr:=TcEventSeverity.Warning);
+	ELSIF (iCycle MOD 25) = 0 THEN
+		msg(sMsg:='cycle mod 25', eSevr:=TcEventSeverity.Error);
 	END_IF
-	//hr := fbMessage.CreateEx(TC_EVENTS.PublisherEventClass.Message, 0);
-	hr := fbMessage.CreateEx(TC_EVENTS.TcGeneralAdsEventClass.Aborted, 0);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	 
+	IF NOT bIsInitalized THEN
+		bIsInitalized := TRUE;
+		hr := fbAlarm.CreateEx(TC_EVENTS.PublisherEventClass.Alarm, TRUE, 0);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
+		//hr := fbMessage.CreateEx(TC_EVENTS.PublisherEventClass.Message, 0);
+		hr := fbMessage.CreateEx(TC_EVENTS.TcGeneralAdsEventClass.Aborted, 0);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
 	END_IF
-END_IF
-
-IF bSetJsonAttribute THEN
-	bSetJsonAttribute := FALSE;
-	hr := fbAlarm.SetJsonAttribute(sJsonAttribute);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	
+	IF bSetJsonAttribute THEN
+		bSetJsonAttribute := FALSE;
+		hr := fbAlarm.SetJsonAttribute(sJsonAttribute);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
+		hr := fbMessage.SetJsonAttribute(sJsonAttribute);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
 	END_IF
-	hr := fbMessage.SetJsonAttribute(sJsonAttribute);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	
+	WHILE nSendMessage > 0 DO
+		hr := fbMessage.Send(0);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
+		nSendMessage := nSendMessage - 1;
+	END_WHILE
+	
+	IF bRaiseAlarm THEN
+		bRaiseAlarm := FALSE;
+		hr := fbAlarm.Raise(0);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
 	END_IF
-END_IF
-
-WHILE nSendMessage > 0 DO
-	hr := fbMessage.Send(0);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	
+	IF bConfirmAlarm THEN
+		bConfirmAlarm := FALSE;
+		hr := fbAlarm.Confirm(0);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
 	END_IF
-	nSendMessage := nSendMessage - 1;
-END_WHILE
-
-IF bRaiseAlarm THEN
-	bRaiseAlarm := FALSE;
-	hr := fbAlarm.Raise(0);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	
+	IF bClearAlarm THEN
+		bClearAlarm := FALSE;
+		hr := fbAlarm.Clear(0, FALSE);
+		IF FAILED(hr) THEN
+			hrLastError := hr;
+		END_IF
 	END_IF
-END_IF
-
-IF bConfirmAlarm THEN
-	bConfirmAlarm := FALSE;
-	hr := fbAlarm.Confirm(0);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
+	
+(*	fbTimer();
+	
+	(* 1st enable, then refresh watchdog every 1s *)
+	IF fbTimer.Q THEN
+		fbWatchdog(
+			sNetID         := '', 
+			nWatchdogTimeS := nWatchdogTimeS, 
+			bExecute       := TRUE, 
+			tTimeout       := T#5S, 
+		);
+		
+		IF NOT fbWatchdog.bBusy THEN
+			bEnabled   := fbWatchdog.bEnabled;
+			bError     := fbWatchdog.bError;
+			nErrID     := fbWatchdog.nErrID;
+			
+			fbWatchdog(bExecute := FALSE);
+		
+			(* restart timer*)
+			fbTimer(IN := FALSE);
+			fbTimer(IN := TRUE, PT := T#1S); (* refresh watchdog every s *)
+		END_IF
 	END_IF
-END_IF
+	*)
 
-IF bClearAlarm THEN
-	bClearAlarm := FALSE;
-	hr := fbAlarm.Clear(0, FALSE);
-	IF FAILED(hr) THEN
-		hrLastError := hr;
-	END_IF
-END_IF
-
-fbTimer();
-
-(* 1st enable, then refresh watchdog every 1s *)
-IF fbTimer.Q THEN
-    fbWatchdog(
-        sNetID         := '', 
-        nWatchdogTimeS := nWatchdogTimeS, 
-        bExecute       := TRUE, 
-        tTimeout       := T#5S, 
-    );
-    
-    IF NOT fbWatchdog.bBusy THEN
-        bEnabled   := fbWatchdog.bEnabled;
-        bError     := fbWatchdog.bError;
-        nErrID     := fbWatchdog.nErrID;
-        
-        fbWatchdog(bExecute := FALSE);
-    
-        (* restart timer*)
-        fbTimer(IN := FALSE);
-        fbTimer(IN := TRUE, PT := T#1S); (* refresh watchdog every s *)
-    END_IF
-END_IF]]></ST>
+__CATCH(exc)
+	nExceptionCount := nExceptionCount + 1;
+__ENDTRY
+]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
