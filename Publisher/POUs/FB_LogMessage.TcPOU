@@ -7,7 +7,7 @@ VAR_INPUT
 	sMsg			: T_MaxString; 		// Message to send
 	eSevr			: TcEventSeverity	:= TcEventSeverity.Verbose;
 	eSubsystem		: E_Subsystem; 		// Subsystem TODO
-	Json			: T_MaxString;		// JSON to add to the message
+	sJson			: T_MaxString	:= '';		// JSON to add to the message
 END_VAR
 
 VAR_OUTPUT
@@ -111,6 +111,7 @@ hr := fbMessage.CreateEx(stEventEntry:=ipResultMessage.stEventEntry, ipSourceInf
 // This is where the message text gets appended:
 fbMessage.ipArguments.Clear();
 fbMessage.ipArguments.AddString(sMsg);
+fbMessage.SetJsonAttribute(sJson);
 
 // For a final format of:
 // 'Path.to.FB_LogMessage/Subsystem': {Unknown,Error,Warning,Verbose} (message)

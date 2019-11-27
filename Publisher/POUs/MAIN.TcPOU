@@ -42,7 +42,7 @@ END_VAR
 	IF (iCycle MOD 50) = 0 THEN
 		msg(sMsg:='cycle mod 50', eSevr:=TcEventSeverity.Warning);
 	ELSIF (iCycle MOD 25) = 0 THEN
-		msg(sMsg:='cycle mod 25', eSevr:=TcEventSeverity.Error);
+		msg(sMsg:='cycle mod 25', eSevr:=TcEventSeverity.Error, sJson:='{"a":1}');
 	END_IF
 	 
 	IF NOT bIsInitalized THEN

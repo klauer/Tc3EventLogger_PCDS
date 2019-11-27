@@ -81,7 +81,7 @@ VAR_INPUT
 	i_fbSocket		:	POINTER TO FB_ConnectionlessSocket;	
 END_VAR
 
-VAR
+VAR_INST
 	bSubscribed		:	BOOL := FALSE;
 END_VAR]]></Declaration>
       <Implementation>
@@ -155,13 +155,16 @@ StoreEvent(fbEvent, eEventType:=E_LogEventType.MessageSent);]]></ST>
     <Method Name="PublishEvents" Id="{1115676e-addb-46ec-b8e8-a33da372678d}">
       <Declaration><![CDATA[METHOD PublishEvents : HRESULT
 VAR
-	fbJson				:	FB_JsonSaxWriter;
-	fbJsonDataType		:	FB_JsonReadWriteDataType;
-	sJsonDoc			:	STRING(10000);
 	nEvent				:	UINT;
 	stPendingEvent		:	REFERENCE TO ST_PendingEvent;
 	stEventInfo			:	REFERENCE TO ST_EventInfo;
 	fbRequestEventText	:	REFERENCE TO FB_RequestEventText;
+END_VAR
+
+VAR_INST
+	fbJson				:	FB_JsonSaxWriter;
+	fbJsonDataType		:	FB_JsonReadWriteDataType;
+	sJsonDoc			:	STRING(10000);
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF nPendingEvents = 0 THEN

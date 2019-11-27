@@ -2,8 +2,20 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
   <GVL Name="GVL_Logger" Id="{5f3f2210-839d-4e90-a9e3-418d9f304b7c}">
     <Declaration><![CDATA[VAR_GLOBAL
-	cLogHost		:	T_IPv4Addr	:= '172.21.148.142';
+	{attribute 'pytmc' := '
+		pv: @(IOC):LCLSGeneral:LogHost
+		io: io
+		field: DESC The log host IP address
+	'}
+	cLogHost		:	STRING(15)	:= '172.21.148.142';
+	
+	{attribute 'pytmc' := '
+		pv: @(IOC):LCLSGeneral:LogPort
+		io: io
+		field: DESC The log host UDP port
+	'}
 	iLogPort		:	UINT		:= 50000;
+
 	sPlcHostname	:	STRING		:= 'unknown';
 	
 	(* Ref: https://infosys.beckhoff.com/english.php?content=../content/1033/tcpipserver/html/TcPlcLibTcpIp_FB_SocketUdpSendTo.htm
