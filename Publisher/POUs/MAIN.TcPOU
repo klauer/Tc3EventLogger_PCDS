@@ -40,7 +40,7 @@ END_VAR
 	iCycle := iCycle + 1;
 	
 	IF (iCycle MOD 50) = 0 THEN
-		msg(sMsg:='cycle mod 50', eSevr:=TcEventSeverity.Warning);
+		msg(sMsg:='cycle mod 50', eSevr:=TcEventSeverity.Warning, sJson:='{}');
 	ELSIF (iCycle MOD 25) = 0 THEN
 		msg(sMsg:='cycle mod 25', eSevr:=TcEventSeverity.Error, sJson:='{"a":1}');
 	END_IF
